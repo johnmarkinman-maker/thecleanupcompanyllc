@@ -155,7 +155,7 @@ body {
 /* ---------- Scroll film ---------- */
 .film {
   position: relative;
-  height: calc(4 * 115dvh);
+  height: calc(4 * 160dvh);
   background: var(--color-charcoal);
 }
 .film-stage {

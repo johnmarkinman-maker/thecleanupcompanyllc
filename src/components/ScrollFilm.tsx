@@ -8,6 +8,8 @@ import { ArrowIcon, PhoneIcon } from "./Icons";
 const CHAPTERS = 4;
 const PORTRAIT = "(max-aspect-ratio: 1/1)";
 const HEADER_PX = 64;
+// Bump when the film or its stills are re-encoded; the files are cached as immutable.
+const V = "?v=2";
 
 const STEPS = [
   { t: "Send the schedule", d: "Turnover date, square footage, anything unusual about the site." },
@@ -19,8 +21,8 @@ function Still({ n, alt }: { n: number; alt: string }) {
   // Only shown (and so only fetched) when prefers-reduced-motion is on.
   return (
     <picture className="chapter-still">
-      <source media={PORTRAIT} srcSet={`/film/stills/mobile-${n}.webp`} />
-      <img src={`/film/stills/desktop-${n}.webp`} alt={alt} loading="lazy" decoding="async" />
+      <source media={PORTRAIT} srcSet={`/film/stills/mobile-${n}.webp${V}`} />
+      <img src={`/film/stills/desktop-${n}.webp${V}`} alt={alt} loading="lazy" decoding="async" />
     </picture>
   );
 }
@@ -100,7 +102,7 @@ export function ScrollFilm() {
     const load = () => {
       const size = window.matchMedia(PORTRAIT).matches ? "mobile" : "desktop";
       // H.264 everywhere it decodes; VP9 WebM for browsers built without it.
-      const src = video.canPlayType('video/mp4; codecs="avc1.640028"') ? `/film/${size}.mp4` : `/film/${size}.webm`;
+      const src = video.canPlayType('video/mp4; codecs="avc1.640028"') ? `/film/${size}.mp4${V}` : `/film/${size}.webm${V}`;
       fetch(src)
         .then((r) => (r.ok ? r.blob() : Promise.reject(r.status)))
         .then((blob) => {
@@ -170,12 +172,12 @@ export function ScrollFilm() {
   };
 
   return (
-    <section ref={sectionRef} className="film" aria-label="Turnover-ready: from dusty site to finished building">
+    <section ref={sectionRef} className="film" aria-label="Turnover-ready: from dusty lobby to finished building">
       <div ref={stageRef} className="film-stage">
         <div className="film-media" aria-hidden="true">
           <picture>
-            <source media={PORTRAIT} srcSet="/film/poster-mobile.webp" type="image/webp" />
-            <img src="/film/poster-desktop.webp" alt="" fetchPriority="high" decoding="async" width={1280} height={720} />
+            <source media={PORTRAIT} srcSet={`/film/poster-mobile.webp${V}`} type="image/webp" />
+            <img src={`/film/poster-desktop.webp${V}`} alt="" fetchPriority="high" decoding="async" width={1280} height={720} />
           </picture>
           <video ref={videoRef} className="film-video" muted playsInline preload="none" disablePictureInPicture tabIndex={-1} />
         </div>
@@ -185,7 +187,7 @@ export function ScrollFilm() {
         </div>
 
         <div ref={setRef(0)} className="chapter" style={{ opacity: 1 }}>
-          <Still n={1} alt="Unfinished commercial ground floor at dawn with construction debris and dust in the light" />
+          <Still n={1} alt="Dusty, unfinished commercial lobby with cardboard and debris on the floor as a crew starts cleaning" />
           <div className="chapter-inner">
             <p className="label text-white/80">Commercial cleaning · Nashville &amp; Central PA</p>
             <h1 className="mt-3 text-[clamp(2.5rem,7.5vw,5rem)] font-semibold leading-[1.02] tracking-tight">
@@ -210,7 +212,7 @@ export function ScrollFilm() {
         </div>
 
         <div ref={setRef(1)} className="chapter" style={{ opacity: 0 }}>
-          <Still n={2} alt="Dust being cleared as crews work toward the glass storefront of a new building" />
+          <Still n={2} alt="Sunlight through tall glass walls as debris is cleared from a new lobby floor" />
           <div className="chapter-inner">
             <p className="label text-white/80">The problem</p>
             <h2 className="mt-3 text-[clamp(2.1rem,6vw,4rem)] font-semibold leading-[1.05] tracking-tight">
@@ -224,7 +226,7 @@ export function ScrollFilm() {
         </div>
 
         <div ref={setRef(2)} id="plan" className="chapter" style={{ opacity: 0 }}>
-          <Still n={3} alt="Technicians in green polos detailing the glass entry and polishing the floor" />
+          <Still n={3} alt="Polished lobby floor reflecting the glass entry of a newly finished building" />
           <div className="chapter-inner">
             <p className="label text-white/80">The plan</p>
             <h2 className="mt-3 text-[clamp(2rem,5.5vw,3.6rem)] font-semibold leading-[1.05] tracking-tight">
@@ -247,7 +249,7 @@ export function ScrollFilm() {
         </div>
 
         <div ref={setRef(3)} className="chapter" style={{ opacity: 0 }}>
-          <Still n={4} alt="Finished commercial building at golden hour with clear glass and a polished entry" />
+          <Still n={4} alt="Finished two-story office building seen from its clean entry walk" />
           <div className="chapter-inner">
             <p className="label text-white/80">The result</p>
             <h2 className="mt-3 text-[clamp(2.1rem,6vw,4rem)] font-semibold leading-[1.05] tracking-tight">
