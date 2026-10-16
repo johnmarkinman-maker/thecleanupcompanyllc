@@ -20,7 +20,9 @@ async function unsubscribe(formData: FormData) {
 
 export default async function UnsubscribePage({ searchParams }: { searchParams: Promise<{ token?: string }> }) {
   const { token = "" } = await searchParams;
-  const [sub] = token ? await sql<{ email: string; status: string }>("select email, status from subscribers where token = $1", [token]) : [];
+  const [sub] = token
+    ? await sql<{ email: string; status: string }>("select email, status from subscribers where token = $1", [token]).catch(() => [])
+    : [];
 
   return (
     <section className="py-20 sm:py-28">
