@@ -1,26 +1,290 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-paper: #f5f6f3;
+  --color-ink: #131a15;
+  --color-muted: #545d56;
+  --color-tint: #e6efe1;
+  --color-green: #3f8c22;
+  --color-deep: #2d6717;
+  --color-line: #dde2db;
+  --color-charcoal: #0f1411;
+  --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+  --radius-card: 14px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: 5rem;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  overflow-x: clip;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-green);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+@layer components {
+.label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 48px;
+  padding: 0 1.35rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: background-color 0.2s, border-color 0.2s, transform 0.2s;
+  white-space: nowrap;
+}
+.btn:active {
+  transform: translateY(1px);
+}
+.btn-primary {
+  background: var(--color-deep);
+  color: #fff;
+}
+.btn-primary:hover {
+  background: #23540f;
+}
+.btn-ghost-dark {
+  border: 1px solid rgb(255 255 255 / 0.45);
+  color: #fff;
+  background: rgb(255 255 255 / 0.08);
+  backdrop-filter: blur(6px);
+}
+.btn-ghost-dark:hover {
+  background: rgb(255 255 255 / 0.18);
+}
+.btn-ghost {
+  border: 1px solid var(--color-line);
+  color: var(--color-ink);
+  background: #fff;
+}
+.btn-ghost:hover {
+  border-color: var(--color-deep);
+}
+
+.field {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid #c9d0c6;
+  border-radius: 10px;
+  background: #fff;
+  padding: 0.65rem 0.85rem;
+  font-size: 1rem;
+  color: var(--color-ink);
+}
+.field:focus {
+  outline: 2px solid var(--color-green);
+  outline-offset: 0;
+  border-color: var(--color-green);
+}
+
+.prose-tcc {
+  font-size: 1.125rem;
+  line-height: 1.75;
+  color: #2a332c;
+}
+.prose-tcc h2 {
+  font-size: 1.6rem;
+  font-weight: 600;
+  line-height: 1.25;
+  margin: 2.5rem 0 0.75rem;
+  color: var(--color-ink);
+}
+.prose-tcc h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 2rem 0 0.5rem;
+  color: var(--color-ink);
+}
+.prose-tcc p {
+  margin: 1rem 0;
+}
+.prose-tcc ul,
+.prose-tcc ol {
+  margin: 1rem 0;
+  padding-left: 1.4rem;
+}
+.prose-tcc ul {
+  list-style: disc;
+}
+.prose-tcc ol {
+  list-style: decimal;
+}
+.prose-tcc li {
+  margin: 0.35rem 0;
+}
+.prose-tcc a {
+  color: var(--color-deep);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.prose-tcc strong {
+  color: var(--color-ink);
+}
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---------- Scroll film ---------- */
+.film {
+  position: relative;
+  height: calc(4 * 115dvh);
+  background: var(--color-charcoal);
+}
+.film-stage {
+  position: sticky;
+  top: 4rem;
+  height: calc(100svh - 4rem);
+  overflow: hidden;
+  isolation: isolate;
+}
+.film-media,
+.film-media img,
+.film-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.film-video {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.film-video.is-ready {
+  opacity: 1;
+}
+.film-shade,
+.chapter-still::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgb(10 13 11 / 0.94) 0%,
+    rgb(10 13 11 / 0.78) 38%,
+    rgb(10 13 11 / 0.2) 72%,
+    rgb(10 13 11 / 0.35) 100%
+  );
+}
+.film-progress {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: rgb(255 255 255 / 0.14);
+  z-index: 2;
+}
+.film-progress > span {
+  display: block;
+  height: 100%;
+  background: var(--color-green);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+.chapter {
+  position: absolute;
+  inset: auto 0 0;
+  color: #fff;
+  will-change: opacity, transform;
+  padding: 0 max(1rem, env(safe-area-inset-right)) max(1.75rem, calc(env(safe-area-inset-bottom) + 1.25rem))
+    max(1rem, env(safe-area-inset-left));
+}
+.chapter-inner {
+  max-width: 40rem;
+}
+.chapter-still {
+  display: none;
+}
+@media (min-aspect-ratio: 1/1) and (min-width: 768px) {
+  .film-shade,
+  .chapter-still::after {
+    background:
+      linear-gradient(to right, rgb(10 13 11 / 0.9) 0%, rgb(10 13 11 / 0.62) 42%, rgb(10 13 11 / 0.08) 75%),
+      linear-gradient(to top, rgb(10 13 11 / 0.45), transparent 40%);
+  }
+  .chapter {
+    inset: 0;
+    display: flex;
+    align-items: center;
+    padding: 2rem max(2rem, env(safe-area-inset-right)) 2rem max(2.5rem, calc(env(safe-area-inset-left) + 1.5rem));
+  }
+  @media (min-width: 1280px) {
+    .chapter {
+      padding-left: max(5rem, calc((100vw - 80rem) / 2 + 2rem));
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .film {
+    height: auto;
+  }
+  .film-stage {
+    position: static;
+    height: auto;
+    overflow: visible;
+  }
+  .film-media,
+  .film-shade,
+  .film-progress {
+    display: none;
+  }
+  .chapter {
+    position: relative;
+    inset: auto;
+    display: flex;
+    align-items: flex-end;
+    min-height: calc(100svh - 4rem);
+    padding-top: 6rem;
+    opacity: 1 !important;
+    transform: none !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    isolation: isolate;
+    overflow: hidden;
+  }
+  .chapter-inner {
+    position: relative;
+    z-index: 1;
+  }
+  .chapter-still {
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+  .chapter-still img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .chapter-still::after {
+    content: "";
+  }
 }

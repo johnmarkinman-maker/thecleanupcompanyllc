@@ -1,36 +1,39 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# The Cleanup Company website
 
-## Getting Started
+Next.js (App Router) + TypeScript + Tailwind. Postgres (Supabase) for leads, subscribers, nurture queue, broadcasts, posts and testimonials. Resend for email, Vercel Cron for the daily nurture run.
 
-First, run the development server:
+## Local
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+cp .env.example .env.local   # set ADMIN_PASSWORD and CRON_SECRET at minimum
+npm run build && npm start   # or npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+With no `DATABASE_URL`, an embedded PGlite database is created in `.data/pglite` and seeded with the three blog posts. With no `RESEND_API_KEY`, emails are logged to the console instead of sent.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Production (Vercel)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Create a Supabase project. Copy the **Transaction pooler** connection string into `DATABASE_URL`. Tables are created automatically on first request (or run `db/schema.sql` in the SQL editor).
+2. Set every variable in `.env.example` in Vercel → Project → Settings → Environment Variables.
+3. Verify the sending domain in Resend and use an address on it for `FROM_EMAIL`.
+4. `vercel.json` schedules `/api/cron/nurture` daily at 14:00 UTC; Vercel sends `CRON_SECRET` automatically.
 
-## Learn More
+## Where things live
 
-To learn more about Next.js, take a look at the following resources:
+- Scroll film: `src/components/ScrollFilm.tsx`, styles at the bottom of `src/app/globals.css`, media in `public/film/`
+- Business facts, services, areas, nav: `src/lib/site.ts`
+- Nurture emails (day 0, 2, 5, 9): `src/lib/nurture.ts`
+- Seed blog posts: `src/lib/seed-posts.ts`
+- Admin: `/admin` (password = `ADMIN_PASSWORD`)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Re-encoding the film
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+SRC=source.mp4
+ffmpeg -i $SRC -an -c:v libx264 -preset slow -crf 20 -g 8 -keyint_min 8 -sc_threshold 0 -pix_fmt yuv420p -movflags +faststart public/film/desktop.mp4
+ffmpeg -i $SRC -an -vf "crop=ih*9/16:ih:(iw-ih*9/16)/2:0,scale=-2:720" -c:v libx264 -preset slow -crf 23 -g 4 -keyint_min 4 -sc_threshold 0 -pix_fmt yuv420p -movflags +faststart public/film/mobile.mp4
+ffmpeg -i public/film/desktop.mp4 -frames:v 1 -c:v libwebp -quality 78 public/film/poster-desktop.webp
+ffmpeg -i public/film/mobile.mp4  -frames:v 1 -c:v libwebp -quality 78 public/film/poster-mobile.webp
+# VP9 fallbacks (browsers without H.264) use the same flags with -c:v libvpx-vp9 -b:v 0 -crf 34/36
+```
